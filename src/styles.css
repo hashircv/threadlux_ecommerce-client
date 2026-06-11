@@ -1695,6 +1695,9 @@ input:focus { border-color: var(--border-cream); }
   font-size: 0.85rem;
   margin-top: 0.5rem;
 }
+.link-btn:hover {
+  color: var(--cream);
+}
 
 /* ------------------------------------------------
    ORDER SUMMARY PAGE
@@ -2145,7 +2148,6 @@ input:focus { border-color: var(--border-cream); }
   margin-top: 1rem;
   background: none;
   border: none;
-  color: #111;
   cursor: pointer;
   font-weight: 600;
 }

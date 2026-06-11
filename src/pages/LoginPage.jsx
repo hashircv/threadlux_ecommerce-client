@@ -77,7 +77,7 @@ function LoginPage() {
             {loading ? "Please wait..." : isRegister ? "Register" : "Login"}
           </button>
 
-          {error && <p className="error">{error}</p>}
+          {error && <h5 className="error">{error}</h5>}
         </form>
 
         <button
