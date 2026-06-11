@@ -36,22 +36,24 @@ function ProductDetailPage() {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
 
-  useEffect(() => {
-    if (selected?.image_url) {
-      setSelectedImage(selected.image_url);
-    }
-  }, [selected]);
+ useEffect(() => {
+  if (selected?.image_urls?.length) {
+    setSelectedImage(selected.image_urls[0]);
+  } else if (selected?.image_url) {
+    setSelectedImage(selected.image_url);
+  }
+}, [selected]);
 
   if (loading || !selected) {
     return <p>Loading product...</p>;
   }
 
-  const images = [
-    selected.image_url,
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1200&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?q=80&w=1200&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1200&auto=format&fit=crop",
-  ];
+ const images =
+  selected.image_urls?.length > 0
+    ? selected.image_urls
+    : selected.image_url
+      ? [selected.image_url]
+      : [];
 
   return (
     <main className="product-detail-page container">
