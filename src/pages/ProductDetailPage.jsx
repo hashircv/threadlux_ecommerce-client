@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProductById } from "../store/productsSlice";
 import { addToCartApi } from "../store/cartSlice";
 
+import LoginModal from "../components/LoginModal";
+
 function ProductDetailPage() {
   const { id } = useParams();
 
@@ -20,6 +22,14 @@ function ProductDetailPage() {
     (state) => state.products
   );
 
+  const { user } = useSelector(
+    (state) => state.auth
+  );
+
+  const [showLoginModal, setShowLoginModal] =
+    useState(false);
+  const [pendingAddToCart, setPendingAddToCart] =
+    useState(false);
   const [quantity, setQuantity] =
     useState(1);
 
@@ -36,24 +46,56 @@ function ProductDetailPage() {
     dispatch(fetchProductById(id));
   }, [dispatch, id]);
 
- useEffect(() => {
-  if (selected?.image_urls?.length) {
-    setSelectedImage(selected.image_urls[0]);
-  } else if (selected?.image_url) {
-    setSelectedImage(selected.image_url);
-  }
-}, [selected]);
+  useEffect(() => {
+    if (selected?.image_urls?.length) {
+      setSelectedImage(selected.image_urls[0]);
+    } else if (selected?.image_url) {
+      setSelectedImage(selected.image_url);
+    }
+  }, [selected]);
+
+  useEffect(() => {
+    async function addPendingProduct() {
+      if (
+        user &&
+        pendingAddToCart &&
+        selected
+      ) {
+        try {
+          await dispatch(
+            addToCartApi({
+              productId: selected.id,
+              quantity,
+            })
+          ).unwrap();
+
+          setPendingAddToCart(false);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+
+    addPendingProduct();
+  }, [
+    user,
+    pendingAddToCart,
+    selected,
+    quantity,
+    dispatch,
+  ]);
+
 
   if (loading || !selected) {
     return <p>Loading product...</p>;
   }
 
- const images =
-  selected.image_urls?.length > 0
-    ? selected.image_urls
-    : selected.image_url
-      ? [selected.image_url]
-      : [];
+  const images =
+    selected.image_urls?.length > 0
+      ? selected.image_urls
+      : selected.image_url
+        ? [selected.image_url]
+        : [];
 
   return (
     <main className="product-detail-page container">
@@ -163,7 +205,7 @@ function ProductDetailPage() {
                   key={color.name}
                   className={
                     selectedColor ===
-                    color.name
+                      color.name
                       ? "color active"
                       : "color"
                   }
@@ -254,6 +296,12 @@ function ProductDetailPage() {
               type="button"
               className="add-cart-btn"
               onClick={async () => {
+                if (!user) {
+                  setPendingAddToCart(true);
+                  setShowLoginModal(true);
+                  return;
+                }
+
                 try {
                   await dispatch(
                     addToCartApi({
@@ -344,6 +392,12 @@ function ProductDetailPage() {
 
         </div>
       </section>
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() =>
+          setShowLoginModal(false)
+        }
+      />
 
     </main>
   );

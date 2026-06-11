@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { addToCartApi } from "../store/cartSlice";
 import LoginModal from "./LoginModal";
@@ -8,26 +8,62 @@ import LoginModal from "./LoginModal";
 function ProductCard({ product }) {
   const dispatch = useDispatch();
 
-  const { token } = useSelector(
+  const { user } = useSelector(
     (state) => state.auth
   );
 
   const [showLoginModal, setShowLoginModal] =
     useState(false);
 
-  const handleAddToCart = () => {
-    if (!token) {
+  const [pendingAddToCart, setPendingAddToCart] =
+    useState(false);
+
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      setPendingAddToCart(true);
       setShowLoginModal(true);
       return;
     }
 
-    dispatch(
-      addToCartApi({
-        productId: product.id,
-        quantity: 1,
-      })
-    );
+    try {
+      await dispatch(
+        addToCartApi({
+          productId: product.id,
+          quantity: 1,
+        })
+      ).unwrap();
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    async function addPendingProduct() {
+      if (user && pendingAddToCart) {
+        try {
+          await dispatch(
+            addToCartApi({
+              productId: product.id,
+              quantity: 1,
+            })
+          ).unwrap();
+
+          setPendingAddToCart(false);
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
+
+    addPendingProduct();
+  }, [
+    user,
+    pendingAddToCart,
+    product.id,
+    dispatch,
+  ]);
+
 
   return (
     <>

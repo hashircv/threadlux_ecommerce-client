@@ -2090,7 +2090,7 @@ input:focus { border-color: var(--border-cream); }
 .login-modal {
   width: 100%;
   max-width: 420px;
-  background: white;
+  background:black;
   padding: 2rem;
   border-radius: 24px;
   position: relative;
@@ -2138,10 +2138,35 @@ input:focus { border-color: var(--border-cream); }
   position: absolute;
   top: 12px;
   right: 14px;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border: none;
-  background: none;
-  font-size: 1.6rem;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.06);
+  color: white;
+
+  font-size: 1.4rem;
+  font-weight: 600;
+
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #111;
+  color:var(--accent);
+  transform: rotate(90deg);
+}
+
+.modal-close:active {
+  transform: scale(0.95);
 }
 
 .link-btn {
